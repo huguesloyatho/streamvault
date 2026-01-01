@@ -1,0 +1,49 @@
+# ===========================================
+# Development Overrides
+# ===========================================
+# This file is automatically loaded by docker compose
+# Use: docker compose up (development mode with hot reload)
+
+services:
+  pocketbase:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: streamvault-backend-dev
+    volumes:
+      - ./backend:/app:cached
+      - pb_data:/pb/pb_data
+      - pb_migrations:/pb/pb_migrations
+      - recordings_data:/pb/recordings
+    ports:
+      - "8090:8090"
+    environment:
+      - PB_DEV_MODE=true
+      - PB_ENCRYPTION_KEY=${PB_ENCRYPTION_KEY:-dev-key-for-development-only!!}
+      - WHISPER_MODEL=${WHISPER_MODEL:-base}
+      - OLLAMA_HOST=${OLLAMA_HOST:-}
+    healthcheck:
+      interval: 10s
+      start_period: 5s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: streamvault-frontend-dev
+    volumes:
+      - ./frontend:/app:cached
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_POCKETBASE_URL=http://localhost:8090
+      - NEXT_PUBLIC_APP_NAME=${NEXT_PUBLIC_APP_NAME:-StreamVault}
+      - WATCHPACK_POLLING=true
+    stdin_open: true
+    tty: true
+    depends_on:
+      pocketbase:
+        condition: service_started

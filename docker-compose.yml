@@ -1,0 +1,84 @@
+services:
+  # ===========================================
+  # PocketBase Backend
+  # ===========================================
+  pocketbase:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: streamvault/pocketbase:${VERSION:-latest}
+    container_name: streamvault-backend
+    hostname: streamvault-backend
+    restart: unless-stopped
+    ports:
+      - "${PB_PORT:-8090}:8090"
+    volumes:
+      - pb_data:/pb/pb_data
+      - pb_migrations:/pb/pb_migrations
+      - recordings_data:/pb/recordings
+    environment:
+      - PB_ENCRYPTION_KEY=${PB_ENCRYPTION_KEY:?PB_ENCRYPTION_KEY is required}
+      - WHISPER_MODEL=${WHISPER_MODEL:-base}
+      - OLLAMA_HOST=${OLLAMA_HOST:-}
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8090/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - streamvault
+    labels:
+      - "traefik.enable=false"
+
+  # ===========================================
+  # Next.js Frontend
+  # ===========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_POCKETBASE_URL=${NEXT_PUBLIC_POCKETBASE_URL:-http://localhost:8090}
+    image: streamvault/frontend:${VERSION:-latest}
+    container_name: streamvault-frontend
+    hostname: streamvault-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_POCKETBASE_URL=${NEXT_PUBLIC_POCKETBASE_URL:-http://localhost:8090}
+      - NEXT_PUBLIC_APP_NAME=${NEXT_PUBLIC_APP_NAME:-StreamVault}
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    networks:
+      - streamvault
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "traefik.enable=false"
+
+# ===========================================
+# Volumes
+# ===========================================
+volumes:
+  pb_data:
+    driver: local
+  pb_migrations:
+    driver: local
+  recordings_data:
+    driver: local
+
+# ===========================================
+# Networks
+# ===========================================
+networks:
+  streamvault:
+    driver: bridge
+    name: streamvault

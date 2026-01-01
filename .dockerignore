@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Dependencies (will be installed in container)
+node_modules
+frontend/node_modules
+
+# Build outputs
+frontend/.next
+frontend/out
+backend/tmp
+
+# Environment files (use Docker env instead)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+nginx/logs/*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backups
+backups/
+
+# SSL certificates (mount separately)
+nginx/ssl/*.pem
+nginx/ssl/*.crt
+nginx/ssl/*.key

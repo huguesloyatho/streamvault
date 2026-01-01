@@ -1,0 +1,281 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: 229 9 20;
+    --color-background: 20 20 20;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background-primary text-text-primary antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-background-secondary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-border-hover;
+  }
+
+  /* Hide scrollbar for horizontal scroll containers */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Focus visible styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background-primary;
+  }
+
+  /* Selection styles */
+  ::selection {
+    @apply bg-primary/30 text-text-primary;
+  }
+}
+
+@layer components {
+  /* Gradient overlays */
+  .gradient-overlay {
+    @apply absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent;
+  }
+
+  .gradient-overlay-left {
+    @apply absolute inset-0 bg-gradient-to-r from-background-primary via-background-primary/80 to-transparent;
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all duration-300 hover:scale-105 hover:z-10 hover:shadow-card-hover;
+  }
+
+  /* Netflix-style row */
+  .channel-row {
+    @apply flex gap-2 overflow-x-auto scrollbar-hide pb-4 -mb-4;
+    scroll-snap-type: x mandatory;
+  }
+
+  .channel-row > * {
+    scroll-snap-align: start;
+  }
+
+  /* Player controls */
+  .player-controls {
+    @apply absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent;
+    @apply transition-opacity duration-300;
+  }
+
+  .player-controls button {
+    @apply cursor-pointer relative z-10;
+  }
+
+  .player-container:hover .player-controls {
+    @apply opacity-100;
+  }
+
+  /* Fullscreen styles */
+  .player-container:fullscreen,
+  .player-container:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+  }
+
+  .player-container:fullscreen video,
+  .player-container:-webkit-full-screen video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+
+  .player-container:fullscreen .player-controls,
+  .player-container:-webkit-full-screen .player-controls {
+    @apply z-50;
+  }
+
+  /* Sidebar styles */
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-3 text-text-secondary rounded-lg transition-all duration-200;
+    @apply hover:bg-surface-hover hover:text-text-primary;
+  }
+
+  .sidebar-item.active {
+    @apply bg-surface-hover text-primary;
+  }
+
+  /* Input focus ring */
+  .input-focus {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+  }
+
+  /* Shimmer animation for loading states */
+  .shimmer {
+    @apply relative overflow-hidden;
+  }
+
+  .shimmer::after {
+    @apply absolute inset-0;
+    content: '';
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite linear;
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply bg-background-secondary/80 backdrop-blur-lg;
+  }
+
+  /* Glow effect on primary elements */
+  .glow-primary {
+    @apply shadow-glow;
+  }
+}
+
+@layer utilities {
+  /* Text gradient */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-hover;
+  }
+
+  /* Aspect ratios */
+  .aspect-video-custom {
+    aspect-ratio: 16 / 9;
+  }
+
+  .aspect-poster {
+    aspect-ratio: 2 / 3;
+  }
+
+  /* Line clamp */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Safe area padding for mobile */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Video player specific styles */
+.video-player {
+  @apply relative w-full h-full bg-black;
+}
+
+.video-player video {
+  @apply w-full h-full object-contain;
+}
+
+/* EPG Grid styles */
+.epg-grid {
+  @apply relative overflow-auto;
+}
+
+.epg-time-slot {
+  @apply absolute top-0 h-full border-l border-border/50;
+}
+
+.epg-program {
+  @apply absolute h-full px-2 py-1 text-xs truncate rounded cursor-pointer;
+  @apply bg-surface hover:bg-surface-hover transition-colors;
+}
+
+.epg-program.live {
+  @apply bg-primary/20 border-l-2 border-primary;
+}
+
+/* Profile avatar styles */
+.profile-avatar {
+  @apply relative rounded-md overflow-hidden cursor-pointer;
+  @apply ring-2 ring-transparent hover:ring-text-primary transition-all duration-200;
+}
+
+.profile-avatar.selected {
+  @apply ring-primary;
+}
+
+/* Carousel navigation buttons */
+.carousel-nav {
+  @apply absolute top-1/2 -translate-y-1/2 z-10;
+  @apply w-12 h-full flex items-center justify-center;
+  @apply bg-gradient-to-r from-background-primary/80 to-transparent;
+  @apply opacity-0 transition-opacity duration-200;
+}
+
+.carousel-nav.right {
+  @apply right-0 bg-gradient-to-l;
+}
+
+.carousel-container:hover .carousel-nav {
+  @apply opacity-100;
+}
+
+/* Mini player styles */
+.mini-player {
+  @apply fixed bottom-4 right-4 w-80 aspect-video z-50;
+  @apply rounded-lg overflow-hidden shadow-2xl;
+  @apply animate-slide-up;
+}
+
+/* Loading screen */
+.loading-screen {
+  @apply fixed inset-0 z-50 flex items-center justify-center bg-background-primary;
+}
+
+/* Auth card */
+.auth-card {
+  @apply w-full max-w-md p-8 bg-background-secondary/90 backdrop-blur-lg rounded-xl shadow-2xl;
+}

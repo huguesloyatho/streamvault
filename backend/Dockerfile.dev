@@ -1,0 +1,26 @@
+# Development Dockerfile with hot reload
+FROM golang:1.22-alpine
+
+WORKDIR /app
+
+# Install dependencies
+RUN apk add --no-cache git ca-certificates tzdata wget ffmpeg
+
+# Install air for hot reload
+RUN go install github.com/air-verse/air@latest
+
+# Copy go mod files
+COPY go.mod go.sum* ./
+RUN go mod download || true
+
+# Copy source
+COPY . .
+RUN go mod tidy
+
+# Create data directories
+RUN mkdir -p /pb/pb_data /pb/pb_migrations /pb/recordings
+
+EXPOSE 8090
+
+# Use air for hot reload
+CMD ["air", "-c", ".air.toml"]
